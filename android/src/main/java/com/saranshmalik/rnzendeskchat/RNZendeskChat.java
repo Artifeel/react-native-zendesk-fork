@@ -131,7 +131,8 @@ public class RNZendeskChat extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void showHelpCenter(ReadableMap options) {
-        HelpCenterActivity.builder().show(MyActivity.this);
+        Activity activity = getCurrentActivity();
+        HelpCenterActivity.builder().show(activity);
     }
 
     @ReactMethod
