@@ -103,12 +103,10 @@ public class RNZendeskChat extends ReactContextBaseJavaModule {
         String appId = options.getString("appId");
         String clientId = options.getString("clientId");
         String url = options.getString("url");
-        String key = options.getString("key");
-        Context context = appContext;
-        Zendesk.INSTANCE.init(context, url, appId, clientId);
+        Zendesk.INSTANCE.init(this, url, appId, clientId);
+        Identity identity = new AnonymousIdentity();
+        Zendesk.INSTANCE.setIdentity(identity);
         Support.INSTANCE.init(Zendesk.INSTANCE);
-        AnswerBot.INSTANCE.init(Zendesk.INSTANCE, Support.INSTANCE);
-        Chat.INSTANCE.init(context, key);
     }
 
     @ReactMethod
@@ -133,23 +131,7 @@ public class RNZendeskChat extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void showHelpCenter(ReadableMap options) {
-        String botName = options.hasKey("botName") ? options.getString("botName") : "Chat Bot";
-        Activity activity = getCurrentActivity();
-        if (options.hasKey("withChat")) {
-            HelpCenterActivity.builder()
-             .withEngines(ChatEngine.engine())
-             .show(activity);
-        } else if (options.hasKey("disableTicketCreation")) {
-            HelpCenterActivity.builder()
-              .withContactUsButtonVisible(false)
-              .withShowConversationsMenuButton(false)
-              .show(activity, ViewArticleActivity.builder()
-                                                 .withContactUsButtonVisible(false)
-                                                 .config());
-        } else {
-            HelpCenterActivity.builder()
-             .show(activity);
-        }
+        HelpCenterActivity.builder().show(MyActivity.this);
     }
 
     @ReactMethod

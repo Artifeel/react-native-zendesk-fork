@@ -80,8 +80,8 @@ RCT_EXPORT_METHOD(init:(NSDictionary *)options) {
       clientId: options[@"clientId"]
       zendeskUrl: options[@"url"]];
   [ZDKSupport initializeWithZendesk: [ZDKZendesk instance]];
-  [ZDKAnswerBot initializeWithZendesk:[ZDKZendesk instance] support:[ZDKSupport instance]];
-  [ZDKChat initializeWithAccountKey:options[@"key"] queue:dispatch_get_main_queue()];
+  id<ZDKObjCIdentity> userIdentity = [[ZDKObjCAnonymous alloc] initWithName:nil email:nil];
+	[[ZDKZendesk instance] setIdentity:userIdentity];
 }
 
 RCT_EXPORT_METHOD(initChat:(NSString *)key) {
@@ -107,39 +107,14 @@ RCT_EXPORT_METHOD(setNotificationToken:(NSData *)deviceToken) {
 }
 
 - (void) showHelpCenterFunction:(NSDictionary *)options {
-    NSError *error = nil;
-    ZDKChatEngine *chatEngine = [ZDKChatEngine engineAndReturnError:&error];
-    ZDKSupportEngine *supportEngine = [ZDKSupportEngine engineAndReturnError:&error];
-    NSArray *engines = @[];
-    ZDKMessagingConfiguration *messagingConfiguration = [ZDKMessagingConfiguration new];
-    NSString *botName = @"ChatBot";
-    if (options[@"botName"]) {
-      botName = options[@"botName"];
-    }
-    if (options[@"withChat"]) {
-      engines = @[(id <ZDKEngine>) [ZDKChatEngine engineAndReturnError:&error]];
-    }
-    ZDKHelpCenterUiConfiguration* helpCenterUiConfig = [ZDKHelpCenterUiConfiguration new];
-    helpCenterUiConfig.objcEngines = engines;
-    ZDKArticleUiConfiguration* articleUiConfig = [ZDKArticleUiConfiguration new];
-    articleUiConfig.objcEngines = engines;
-     if (options[@"disableTicketCreation"]) {
-         helpCenterUiConfig.showContactOptions = NO;
-         articleUiConfig.showContactOptions = NO;
-    }
-    UIViewController* controller = [ZDKHelpCenterUi buildHelpCenterOverviewUiWithConfigs: @[helpCenterUiConfig, articleUiConfig]];
-    // controller.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle: @"Close"
-    //                                                                                    style: UIBarButtonItemStylePlain
-    //                                                                                   target: self
-    //                                                                                   action: @selector(chatClosedClicked)];
+  UIViewController *controller = [ZDKHelpCenterUi buildHelpCenterOverviewUiWithConfigs:@[]];
+  UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+  while (topController.presentedViewController) {
+      topController = topController.presentedViewController;
+  }
 
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    while (topController.presentedViewController) {
-        topController = topController.presentedViewController;
-    }
-
-    UINavigationController *navControl = [[UINavigationController alloc] initWithRootViewController: controller];
-    [topController presentViewController:navControl animated:YES completion:nil];
+  UINavigationController *navControl = [[UINavigationController alloc] initWithRootViewController: controller];
+  [topController presentViewController:navControl animated:YES completion:nil];
 }
 
 - (void) startChatFunction:(NSDictionary *)options {
