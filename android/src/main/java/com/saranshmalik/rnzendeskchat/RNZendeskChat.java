@@ -103,7 +103,8 @@ public class RNZendeskChat extends ReactContextBaseJavaModule {
         String appId = options.getString("appId");
         String clientId = options.getString("clientId");
         String url = options.getString("url");
-        Zendesk.INSTANCE.init(this, url, appId, clientId);
+        Context context = appContext;
+        Zendesk.INSTANCE.init(context, url, appId, clientId);
         Identity identity = new AnonymousIdentity();
         Zendesk.INSTANCE.setIdentity(identity);
         Support.INSTANCE.init(Zendesk.INSTANCE);
